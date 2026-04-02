@@ -1,0 +1,26 @@
+[build]
+  command   = "npm run build"
+  publish   = "dist"
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+# Redirect /api/* → Netlify functions
+[[redirects]]
+  from   = "/api/analyze"
+  to     = "/.netlify/functions/analyze"
+  status = 200
+
+# SPA fallback — all other routes serve index.html
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200
+
+[dev]
+  command   = "vite"
+  port      = 3000
+  functions = "netlify/functions"
+  publish   = "dist"
+  targetPort = 5173
