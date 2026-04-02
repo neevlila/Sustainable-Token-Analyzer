@@ -64,7 +64,7 @@ function App() {
             onClick={() => setMobileOpen(false)}
           />
           <div className="absolute left-0 top-0 h-full w-64 bg-background shadow-xl z-50">
-            <Sidebar activeTab={activeTab} onTabChange={(t) => navigateTo(t as Tab)} />
+            <Sidebar activeTab={activeTab} onTabChange={(t) => navigateTo(t as Tab)} className="flex w-full" />
           </div>
         </div>
       )}

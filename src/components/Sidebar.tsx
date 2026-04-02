@@ -5,6 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 interface Props {
   activeTab: string;
   onTabChange: (tab: string) => void;
+  className?: string;
 }
 
 const navItems = [
@@ -14,8 +15,8 @@ const navItems = [
   { id: "suggestions",label: "Suggestions", icon: Sparkles },
 ];
 
-export const Sidebar: React.FC<Props> = ({ activeTab, onTabChange }) => (
-  <div className="w-64 border-r border-border bg-background h-screen sticky top-0 flex flex-col hidden md:flex shrink-0">
+export const Sidebar: React.FC<Props> = ({ activeTab, onTabChange, className = "hidden md:flex sticky top-0" }) => (
+  <div className={`w-64 border-r border-border bg-background h-screen flex flex-col shrink-0 ${className}`}>
     {/* Logo */}
     <div className="p-6 border-b border-border">
       <div className="flex items-center gap-2">
