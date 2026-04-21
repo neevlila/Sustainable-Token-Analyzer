@@ -6,6 +6,7 @@ import { ResultsPanel } from "@/components/ResultsPanel";
 import { ComparisonPanel } from "@/components/ComparisonPanel";
 import { DashboardPanel } from "@/components/DashboardPanel";
 import { SuggestionsPanel } from "@/components/SuggestionsPanel";
+import { Footer } from "@/components/Footer";
 import { useAnalyzer } from "@/hooks/useAnalyzer";
 import { useHistory } from "@/hooks/useHistory";
 
@@ -148,6 +149,9 @@ function App() {
             )}
 
           </div>
+          
+          {/* ── Footer ─────────────────────────────────────────────────────── */}
+          <Footer />
         </main>
       </div>
     </div>
