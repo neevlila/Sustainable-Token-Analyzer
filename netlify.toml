@@ -6,10 +6,10 @@
 [build.environment]
   NODE_VERSION = "18"
 
-# Redirect /api/* → Netlify functions
+# API route - rewrite to Netlify function with wildcard pattern
 [[redirects]]
-  from   = "/api/analyze"
-  to     = "/.netlify/functions/analyze"
+  from   = "/api/*"
+  to     = "/.netlify/functions/:splat"
   status = 200
 
 # SPA fallback — all other routes serve index.html
@@ -24,3 +24,30 @@
   functions = "netlify/functions"
   publish   = "dist"
   targetPort = 5173
+
+# Security headers for all responses
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Prevent clickjacking
+    X-Frame-Options = "DENY"
+    # Prevent MIME type sniffing
+    X-Content-Type-Options = "nosniff"
+    # Enable XSS protection
+    X-XSS-Protection = "1; mode=block"
+    # Referrer policy
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    # Permissions policy (formerly Feature-Policy)
+    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+    # Content Security Policy
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self' https://integrate.api.nvidia.com"
+    # Strict Transport Security (enable after testing)
+    # Strict-Transport-Security = "max-age=31536000; includeSubDomains"
+
+# API endpoint security headers
+[[headers]]
+  for = "/.netlify/functions/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Cache-Control = "no-cache, no-store, must-revalidate"

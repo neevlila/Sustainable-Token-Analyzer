@@ -1,8 +1,10 @@
-import React, { useState } from "react";
-import { Activity, Loader2, AlertCircle, X } from "lucide-react";
+import React, { useState, useMemo } from "react";
+import { Activity, Loader2, AlertCircle, X, Zap } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { buildResult, clientSideOptimize } from "@/lib/analyzer";
+import type { AnalysisResult } from "@/types";
 
 interface Props {
   loading: boolean;
@@ -30,6 +32,13 @@ export const AnalyzerPanel: React.FC<Props> = ({ loading, error, onAnalyze, onRe
   };
 
   const tokenEstimate = Math.ceil(prompt.length / 4);
+
+  // Real-time client-side analysis as user types
+  const liveResult: AnalysisResult | null = useMemo(() => {
+    if (!prompt.trim()) return null;
+    const optimized = clientSideOptimize(prompt);
+    return buildResult(prompt, optimized);
+  }, [prompt]);
 
   return (
     <div className="space-y-4">
@@ -82,6 +91,7 @@ export const AnalyzerPanel: React.FC<Props> = ({ loading, error, onAnalyze, onRe
                 onClick={handleSubmit}
                 disabled={!prompt.trim() || loading}
                 className="bg-green-600 hover:bg-green-700 text-white"
+                title={liveResult ? "Get advanced AI optimization" : "Start typing to see live estimates"}
               >
                 {loading ? (
                   <>
@@ -90,8 +100,8 @@ export const AnalyzerPanel: React.FC<Props> = ({ loading, error, onAnalyze, onRe
                   </>
                 ) : (
                   <>
-                    <Activity className="mr-2 h-4 w-4" />
-                    Analyze Prompt
+                    <Zap className="mr-2 h-4 w-4" />
+                    {liveResult ? "Optimize" : "Analyze"}
                   </>
                 )}
               </Button>

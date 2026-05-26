@@ -6,9 +6,59 @@ import {
 import type { AnalyzerState, AnalysisResult } from '@/types';
 
 const API_URL = '/api/analyze';
+const CACHE_MAX_SIZE = 100;
+const CACHE_TTL_MS = 3600000; // 1 hour
 
-// Simple in-memory cache keyed by trimmed prompt text
-const cache = new Map<string, AnalysisResult>();
+interface CacheEntry {
+  result: AnalysisResult;
+  timestamp: number;
+}
+
+// LRU Cache with TTL and size limits
+class LRUCache {
+  private cache = new Map<string, CacheEntry>();
+  private maxSize: number;
+  private ttl: number;
+
+  constructor(maxSize: number = 100, ttl: number = 3600000) {
+    this.maxSize = maxSize;
+    this.ttl = ttl;
+  }
+
+  get(key: string): AnalysisResult | null {
+    const entry = this.cache.get(key);
+    if (!entry) return null;
+
+    const age = Date.now() - entry.timestamp;
+    if (age > this.ttl) {
+      this.cache.delete(key);
+      return null;
+    }
+
+    return entry.result;
+  }
+
+  set(key: string, result: AnalysisResult): void {
+    if (this.cache.size >= this.maxSize) {
+      const firstKey = this.cache.keys().next().value;
+      this.cache.delete(firstKey);
+    }
+    this.cache.set(key, {
+      result,
+      timestamp: Date.now(),
+    });
+  }
+
+  has(key: string): boolean {
+    return this.get(key) !== null;
+  }
+
+  clear(): void {
+    this.cache.clear();
+  }
+}
+
+const cache = new LRUCache(CACHE_MAX_SIZE, CACHE_TTL_MS);
 
 export function useAnalyzer() {
   const [state, setState] = useState<AnalyzerState>({
@@ -25,8 +75,11 @@ export function useAnalyzer() {
 
     // Return cached result immediately
     if (cache.has(trimmed)) {
-      setState({ loading: false, error: null, result: cache.get(trimmed)! });
-      return;
+      const cachedResult = cache.get(trimmed);
+      if (cachedResult) {
+        setState({ loading: false, error: null, result: cachedResult });
+        return;
+      }
     }
 
     // Cancel any previous in-flight request
