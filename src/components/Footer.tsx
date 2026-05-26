@@ -9,9 +9,6 @@ export function Footer() {
           <p className="text-sm text-muted-foreground/60 text-center">
             &copy; {new Date().getFullYear()} Sustainable Token Analyzer. Built with innovation & sustainability.
           </p>
-          <p className="text-sm text-muted-foreground/60 text-center">
-            Made By Mahek Chavda, Drashti Bambharoliya, Preksha Thakkar, Ohm Chauhan, Archit Pithadiya, Neev Lila.
-          </p>
         </div>
       </div>
     </footer>
